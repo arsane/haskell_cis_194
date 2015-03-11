@@ -54,7 +54,7 @@ map' f = foldr (\a bs -> (f a) : bs) []
 -- http://stackoverflow.com/questions/6172004/writing-foldl-using-foldr
 
 myFoldl :: (a -> b -> a) -> a -> [b] -> a
-myFoldl f base xs = foldr (flip f) base (foldr (\a bs -> bs ++ [a]) [] xs) -- fixme: out of memory
+myFoldl f base xs = foldr (\x g -> (\c -> g (f c x))) id xs base
 
 -- Exercise 4: Finding primes
 -- ==========================
