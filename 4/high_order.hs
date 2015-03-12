@@ -1,5 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
 
+import Data.List
+
 -- Exercise 1: Wholemeal programming
 -- =================================
 
@@ -63,5 +65,17 @@ myFoldl f base xs = foldr (\x g -> (\c -> g (f c x))) id xs base
 -- Given an integer n, your function should generate all odd prime numbers 
 -- up to 2n+2
 
--- sieveSundaram :: Integer -> [Integer]
--- sieveSundaram = 
+sSundDelete :: Integer -> [Integer]
+sSundDelete n = (filter (<=n) . Data.List.sort) [i+j+2*i*j|let n'=fromIntegral n, i<-[1..floor(sqrt (n' / 2))],
+                                                           let i'=fromIntegral i, j<-[i..floor((n'-i')/(2*i'+1))]]
+                                          
+sSunMerge :: [Integer] -> [Integer] -> [Integer]
+sSunMerge [] _  = []
+sSunMerge xs [] = xs
+sSunMerge a@(x:xs) b@(y:ys)
+    | x < y  = x : (sSunMerge xs b)
+    | x == y = sSunMerge xs ys
+    | x > y  = sSunMerge a ys
+
+sieveSundaram :: Integer -> [Integer]
+sieveSundaram n = map (\x -> 2*x + 1) $ sSunMerge [1..n] (sSundDelete n)
