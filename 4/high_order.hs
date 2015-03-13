@@ -49,19 +49,12 @@ isBalanced (Node n t1 val t2) = and [heightTree t1 == heightTree t2, isBalanced 
 
 insertInTree :: a -> Tree a -> Tree a
 insertInTree x  Leaf = Node 0 (Leaf) x (Leaf)
-insertInTree x (Node n t1 val t2) = if (heightTree t1) == (heightTree t2)
-                                    then
-                                        if (isBalanced t2)
-                                        -- both t1 and t2 are full with same height, we need start a new level of leaves.
-                                        then (Node (n+1) (insertInTree x t1) val t2)
-                                        -- t2 not full yet.
-                                        else (Node n t1 val (insertInTree x t2))
-                                    else -- h1 > h2
-                                        if (isBalanced t1)
-                                        -- t1 is full
-                                        then (Node n t1 val (insertInTree x t2))
-                                        -- t1 not full
-                                        else (Node n (insertInTree x t1) val t2)
+insertInTree x (Node n t1 val t2)
+    | heightTree t1 < heightTree t2 = (Node n t2 val (insertInTree x t1))
+    | heightTree t1 > heightTree t2 = (Node n t1 val (insertInTree x t2))
+    | (not $ isBalanced t1)         = (Node n t2 val (insertInTree x t1))
+    | (not $ isBalanced t2)         = (Node n t1 val (insertInTree x t2))
+    | otherwise                     = (Node (n+1) t2 val (insertInTree x t1))
 
 foldTree :: [a] -> Tree a
 foldTree = foldr (\x tree -> insertInTree x tree) Leaf
