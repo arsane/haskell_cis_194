@@ -43,17 +43,17 @@ heightTree :: Tree a -> Integer
 heightTree Leaf = 0
 heightTree (Node n t1 val t2) = n+1
 
-isBalanced :: Tree a -> Bool
-isBalanced Leaf = True
-isBalanced (Node n t1 val t2) = and [heightTree t1 == heightTree t2, isBalanced t1, isBalanced t2]
+isFull :: Tree a -> Bool
+isFull Leaf = True
+isFull (Node n t1 val t2) = and [heightTree t1 == heightTree t2, isFull t1, isFull t2]
 
 insertInTree :: a -> Tree a -> Tree a
 insertInTree x  Leaf = Node 0 (Leaf) x (Leaf)
 insertInTree x (Node n t1 val t2)
     | heightTree t1 < heightTree t2 = (Node n t2 val (insertInTree x t1))
     | heightTree t1 > heightTree t2 = (Node n t1 val (insertInTree x t2))
-    | (not $ isBalanced t1)         = (Node n t2 val (insertInTree x t1))
-    | (not $ isBalanced t2)         = (Node n t1 val (insertInTree x t2))
+    | (not $ isFull t1)             = (Node n t2 val (insertInTree x t1))
+    | (not $ isFull t2)             = (Node n t1 val (insertInTree x t2))
     | otherwise                     = (Node (n+1) t2 val (insertInTree x t1))
 
 foldTree :: [a] -> Tree a
