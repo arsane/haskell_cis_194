@@ -38,9 +38,34 @@ data Tree a = Leaf
             | Node Integer (Tree a) a (Tree a)
     deriving (Show, Eq)
 
--- foldTree :: [a] -> Tree a
+-- lousy implementation, to be fixed.
+heightTree :: Tree a -> Integer
+heightTree Leaf = 0
+heightTree (Node n t1 val t2) = n+1
 
+isBalanced :: Tree a -> Bool
+isBalanced Leaf = True
+isBalanced (Node n t1 val t2) = and [heightTree t1 == heightTree t2, isBalanced t1, isBalanced t2]
 
+insertInTree :: a -> Tree a -> Tree a
+insertInTree x  Leaf = Node 0 (Leaf) x (Leaf)
+insertInTree x (Node n t1 val t2) = if (heightTree t1) == (heightTree t2)
+                                    then
+                                        if (isBalanced t2)
+                                        -- both t1 and t2 are full with same height, we need start a new level of leaves.
+                                        then (Node (n+1) (insertInTree x t1) val t2)
+                                        -- t2 not full yet.
+                                        else (Node n t1 val (insertInTree x t2))
+                                    else -- h1 > h2
+                                        if (isBalanced t1)
+                                        -- t1 is full
+                                        then (Node n t1 val (insertInTree x t2))
+                                        -- t1 not full
+                                        else (Node n (insertInTree x t1) val t2)
+
+foldTree :: [a] -> Tree a
+foldTree = foldr (\x tree -> insertInTree x tree) Leaf
+        
 -- Exercise 3: More folds
 -- ======================
 
@@ -68,7 +93,7 @@ myFoldl f base xs = foldr (\x g -> (\c -> g (f c x))) id xs base
 sSundDelete :: Integer -> [Integer]
 sSundDelete n = (filter (<=n) . Data.List.sort) [i+j+2*i*j|let n'=fromIntegral n, i<-[1..floor(sqrt (n' / 2))],
                                                            let i'=fromIntegral i, j<-[i..floor((n'-i')/(2*i'+1))]]
-                                          
+
 sSunMerge :: [Integer] -> [Integer] -> [Integer]
 sSunMerge [] _  = []
 sSunMerge xs [] = xs
