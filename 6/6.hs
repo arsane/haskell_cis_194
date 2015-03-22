@@ -1,0 +1,48 @@
+{-# OPTIONS_GHC -Wall #-}
+
+-- Fibonacci numbers
+-- exercise 1
+
+fib :: Integer -> Integer
+fib 0 = 0
+fib 1 = 1
+fib n = (fib (n-1)) + (fib (n-2))
+
+fibs1 :: [Integer]
+fibs1 = map fib [0..]
+
+-- exercise 2
+
+fibs2 :: [Integer]
+fibs2 = 0:1:next fibs2
+	where next (a:t@(b:_)) = (a+b):next t
+
+-- exercise 3
+
+data Stream a = Cons a (Stream a)
+
+streamToList :: Stream a -> [a]
+streamToList (Cons x y) = x:(streamToList y)
+
+-- display the first 20 elements
+instance Show a => Show (Stream a) where
+	show m = show $ zipWith (\x _ -> x) (streamToList m ) [0..19]
+
+-- exercise 4
+
+-- streamRepeat "ABC"
+streamRepeat :: a -> Stream a
+streamRepeat n = Cons n (streamRepeat n)
+
+-- streamMap (\x -> [1..x]) $ streamRepeat 5
+streamMap :: (a -> b) -> Stream a -> Stream b
+streamMap f (Cons x y) = Cons (f x) (streamMap f y)
+
+-- streamFromSeed (\x->x+2) 2
+streamFromSeed :: (a -> a) -> a -> Stream a
+streamFromSeed f n = Cons n (streamFromSeed f (f n))
+
+-- exercise 5
+
+nats :: Stream Integer
+nats = streamFromSeed (\x -> x + 1) 0
