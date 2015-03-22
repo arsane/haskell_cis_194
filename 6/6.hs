@@ -26,7 +26,8 @@ streamToList (Cons x y) = x:(streamToList y)
 
 -- display the first 20 elements
 instance Show a => Show (Stream a) where
-	show m = show $ zipWith (\x _ -> x) (streamToList m ) [0..19]
+	show m = show $ take 80 (streamToList m )
+--	show m = show $ zipWith (\x _ -> x) (streamToList m ) [0..19]
 
 -- exercise 4
 
@@ -46,3 +47,18 @@ streamFromSeed f n = Cons n (streamFromSeed f (f n))
 
 nats :: Stream Integer
 nats = streamFromSeed (\x -> x + 1) 0
+
+-- https://mail.haskell.org/pipermail/beginners/2014-February/013160.html
+-- interleaveStreams (streamRepeat 0)
+--   (interleaveStreams (streamRepeat 1)
+--     (interleaveStreams (streamRepeat 2)
+--       (interleaveStreams (streamRepeat 3)
+--         ...
+
+interleaveStreams :: Stream a -> Stream a -> Stream a
+interleaveStreams (Cons a as) bs = Cons a (case bs of Cons b bs' -> Cons b (interleaveStreams as bs'))
+
+ruler :: Stream Integer
+ruler = foldr1 interleaveStreams (map streamRepeat [0..])
+
+-- exercise 6
