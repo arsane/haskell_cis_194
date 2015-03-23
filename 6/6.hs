@@ -1,4 +1,6 @@
 {-# OPTIONS_GHC -Wall #-}
+{-# OPTIONS_GHC -fno-warn-missing-methods #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 -- Fibonacci numbers
 -- exercise 1
@@ -26,7 +28,7 @@ streamToList (Cons x y) = x:(streamToList y)
 
 -- display the first 20 elements
 instance Show a => Show (Stream a) where
-	show m = show $ take 80 (streamToList m )
+	show m = show $ take 40 (streamToList m )
 --	show m = show $ zipWith (\x _ -> x) (streamToList m ) [0..19]
 
 -- exercise 4
@@ -62,3 +64,16 @@ ruler :: Stream Integer
 ruler = foldr1 interleaveStreams (map streamRepeat [0..])
 
 -- exercise 6
+z :: Stream Integer
+z = Cons 0 (Cons 1 (streamRepeat 0))
+
+instance Num (Stream Integer) where
+    fromInteger n = Cons n (streamRepeat 0)
+    (+) (Cons a as) (Cons b bs) = Cons (a + b) (as + bs)
+    (-) (Cons a as) (Cons b bs) = Cons (a - b) (as - bs)
+    (*) (Cons a as') bs@(Cons b bs') = Cons (a*b) ((mulis a bs') + (as'*bs))
+                                        where mulis a' (Cons c cs) = Cons (a'*c) (mulis a' cs)
+
+-- z^4
+-- (1+z)^5
+-- (z^2 + z + 3) * (z - 5)
