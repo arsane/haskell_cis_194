@@ -69,8 +69,8 @@ z = Cons 0 (Cons 1 (streamRepeat 0))
 
 instance Num (Stream Integer) where
     fromInteger n = Cons n (streamRepeat 0)
+    negate (Cons a as) = Cons (negate a) (negate as)    
     (+) (Cons a as) (Cons b bs) = Cons (a + b) (as + bs)
-    (-) (Cons a as) (Cons b bs) = Cons (a - b) (as - bs)
     (*) (Cons a as') bs@(Cons b bs') = Cons (a*b) ((mulis a bs') + (as'*bs))
                                         where mulis a' (Cons c cs) = Cons (a'*c) (mulis a' cs)
 
