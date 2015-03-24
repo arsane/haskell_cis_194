@@ -77,3 +77,11 @@ instance Num (Stream Integer) where
 -- z^4
 -- (1+z)^5
 -- (z^2 + z + 3) * (z - 5)
+
+instance Fractional (Stream Integer) where
+    (/) as@(Cons a as') bs@(Cons b bs') = Cons (a `div` b) (mulis (1 `div` b) (as' - ((as/bs)*bs')))
+                                        where mulis a' (Cons c cs) = Cons (a'*c) (mulis a' cs)
+
+-- Fibonacci numbers
+fib3 :: Stream Integer                                        
+fib3 = z / (1 - z - z^2)
