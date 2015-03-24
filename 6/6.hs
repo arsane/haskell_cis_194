@@ -87,8 +87,8 @@ instance Fractional (Stream Integer) where
     (/) as@(Cons a as') bs@(Cons b bs') = Cons (a `div` b) (imulstream (1 `div` b) (as' - ((as/bs)*bs')))
 
 -- Fibonacci numbers
-fib3 :: Stream Integer
-fib3 = z / (1 - z - z^2)
+fibs3 :: Stream Integer
+fibs3 = z / (1 - z - z^2)
 
 -- exercise 7
 
