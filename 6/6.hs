@@ -103,8 +103,8 @@ instance Num Matrix where
 
 -- map fib4 [0..20]
 fib4 :: Integer -> Integer
-fib4 n = corner $ matrix n 
-            where corner (Matrix _ a _ _) = a
+fib4 n = getm1 $ matrix n 
+            where getm1 (Matrix _ a _ _) = a
                   matrix n
                         | n == 0 = Matrix 0 0 0 0
                         | n == 1 = Matrix 1 1 1 0
