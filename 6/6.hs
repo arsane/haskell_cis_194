@@ -67,21 +67,46 @@ ruler = foldr1 interleaveStreams (map streamRepeat [0..])
 z :: Stream Integer
 z = Cons 0 (Cons 1 (streamRepeat 0))
 
+-- helper
+imulstream :: Integer -> Stream Integer -> Stream Integer
+imulstream n (Cons a as) = Cons (n*a) (imulstream n as)
+
+-- Num instance
 instance Num (Stream Integer) where
     fromInteger n = Cons n (streamRepeat 0)
     negate (Cons a as) = Cons (negate a) (negate as)    
     (+) (Cons a as) (Cons b bs) = Cons (a + b) (as + bs)
-    (*) (Cons a as') bs@(Cons b bs') = Cons (a*b) ((mulis a bs') + (as'*bs))
-                                        where mulis a' (Cons c cs) = Cons (a'*c) (mulis a' cs)
+    (*) (Cons a as') bs@(Cons b bs') = Cons (a*b) ((imulstream a bs') + (as'*bs))
 
 -- z^4
 -- (1+z)^5
 -- (z^2 + z + 3) * (z - 5)
 
+-- Fractional instance
 instance Fractional (Stream Integer) where
-    (/) as@(Cons a as') bs@(Cons b bs') = Cons (a `div` b) (mulis (1 `div` b) (as' - ((as/bs)*bs')))
-                                        where mulis a' (Cons c cs) = Cons (a'*c) (mulis a' cs)
+    (/) as@(Cons a as') bs@(Cons b bs') = Cons (a `div` b) (imulstream (1 `div` b) (as' - ((as/bs)*bs')))
 
 -- Fibonacci numbers
-fib3 :: Stream Integer                                        
+fib3 :: Stream Integer
 fib3 = z / (1 - z - z^2)
+
+-- exercise 7
+
+data Matrix = Matrix Integer Integer Integer Integer
+        deriving Show
+instance Num Matrix where
+    (*) (Matrix a0 a1 a2 a3) (Matrix b0 b1 b2 b3) = Matrix c0 c1 c2 c3
+                                    where c0 = a0*b0 + a1*b2
+                                          c1 = a0*b1 + a1*b3
+                                          c2 = a2*b0 + a3*b2
+                                          c3 = a2*b1 + a3*b3
+
+-- map fib4 [0..20]
+fib4 :: Integer -> Integer
+fib4 n = corner $ matrix n 
+            where corner (Matrix _ a _ _) = a
+                  matrix n
+                        | n == 0 = Matrix 0 0 0 0
+                        | n == 1 = Matrix 1 1 1 0
+                        | even n = (matrix (n `div` 2))^2
+                        | odd  n = (matrix 1) * (matrix (n - 1))
