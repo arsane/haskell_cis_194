@@ -1,8 +1,12 @@
 {-# OPTIONS_GHC -Wall #-}
+{-# LANGUAGE FlexibleInstances #-}
+
+module JoinListBuffer where
 
 import Data.Monoid
 import Sized
 import Scrabble
+import Buffer
 
 data JoinList m a = Empty
                 |   Single m a
@@ -34,18 +38,18 @@ indexJ n (Append m j1 j2)
     | otherwise                         = indexJ (n - (getSize . size . tag $ j1)) j2
 
 -- convert a JoinList to a list
-jlToList :: JoinList m a -> [a]
-jlToList Empty              = []
-jlToList (Single _ a)       = [a]
-jlToList (Append _ l1 l2)   = jlToList l1 ++ jlToList l2
+jtToList :: JoinList m a -> [a]
+jtToList Empty              = []
+jtToList (Single _ a)       = [a]
+jtToList (Append _ l1 l2)   = jtToList l1 ++ jtToList l2
 
 -- drops the first n elements from a JoinList
 dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
 dropJ _ Empty           = Empty
 dropJ 1 (Single _ _)    = Empty
-dropJ _ jl@(Single _ _) = jl
-dropJ n jl@(Append m j1 j2)
-    | n < 0                             = jl
+dropJ _ jt@(Single _ _) = jt
+dropJ n jt@(Append m j1 j2)
+    | n < 0                             = jt
     | n >= (getSize . size $ m)         = Empty
     | n <  (getSize . size . tag $ j1)  = (dropJ n j1) +++ j2
     | otherwise                         = dropJ (n - (getSize . size . tag $ j1)) j2
@@ -54,10 +58,10 @@ dropJ n jl@(Append m j1 j2)
 takeJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
 takeJ _ Empty           = Empty
 takeJ 0 _               = Empty
-takeJ _ jl@(Single _ _) = jl
-takeJ n jl@(Append m j1 j2)
+takeJ _ jt@(Single _ _) = jt
+takeJ n jt@(Append m j1 j2)
     | n < 0                             = Empty
-    | n >= (getSize . size $ m)         = jl
+    | n >= (getSize . size $ m)         = jt
     | n <  (getSize . size . tag $ j1)  = takeJ n j1
     | otherwise                         = j1 +++ (takeJ (n - (getSize . size . tag $ j1)) j2)
 
@@ -67,4 +71,12 @@ scoreLine :: String -> JoinList Score String
 scoreLine s = Single (scoreString s) s
 
 -- exercise 4
+
+instance Buffer (JoinList (Score, Size) String) where
+  toString           = init . unlines . jtToList
+  fromString      s  = foldr (\x acc -> x +++ acc) Empty (map (\x -> Single (scoreString x, Size 1) x) (lines s))
+  line               = indexJ
+  replaceLine n l b  = takeJ n b +++ fromString l +++ dropJ (n + 1) b
+  numLines           = getSize  . snd . tag
+  value              = getScore . fst . tag
 
