@@ -2,6 +2,7 @@
 
 import Data.Monoid
 import Sized
+import Scrabble
 
 data JoinList m a = Empty
                 |   Single m a
@@ -61,3 +62,9 @@ takeJ n jl@(Append m j1 j2)
     | otherwise                         = j1 +++ (takeJ (n - (getSize . size . tag $ j1)) j2)
 
 -- exercise 3
+-- scoreLine "yay " +++ scoreLine "haskell!"
+scoreLine :: String -> JoinList Score String
+scoreLine s = Single (scoreString s) s
+
+-- exercise 4
+

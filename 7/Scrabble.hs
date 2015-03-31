@@ -47,8 +47,8 @@ score c
                   ] . toUpper $ c
     | otherwise = Score 0
 
- --scoreString :: String -> Score
--- scoreString = sum 
+scoreString :: String -> Score
+scoreString = sum . map score
 
 
 
