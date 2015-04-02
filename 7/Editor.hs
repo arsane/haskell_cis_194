@@ -91,7 +91,7 @@ getCommand = io $ readCom <$> getLine
 doCommand :: Buffer b => Command -> Editor b ()
 doCommand View = do
   cur  <- getCurLine
-  let ls = [(cur - 2) .. (cur + 2)]
+  let ls = [(cur - 20) .. (cur + 20)]
   ss <- mapM (\l -> onBuffer $ line l) ls
   zipWithM_ (showL cur) ls ss
  where
@@ -111,7 +111,7 @@ doCommand (Load filename) = do
                          putStrLn "File not found." >> return Nothing
                       ) $ do
                  h <- openFile filename ReadMode
-                 hSetEncoding h utf8
+                 -- hSetEncoding h utf8
                  Just <$> hGetContents h
   maybe (return ()) (modBuffer . const . fromString) mstr
 

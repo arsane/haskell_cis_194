@@ -14,3 +14,5 @@ carolJoinList :: IO (JoinList (Score, Size) String)
 carolJoinList = do
     f  <- readFile "carol.txt"
     return ((fromString f) :: JoinList (Score, Size) String)
+
+-- liftM (indexJ 1000) carolJoinList
