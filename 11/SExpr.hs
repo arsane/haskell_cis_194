@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wall #-}
 {- CIS 194 HW 11
    due Monday, 8 April
 -}
@@ -6,6 +7,7 @@ module SExpr where
 
 import AParser
 import Control.Applicative
+import Data.Char
 
 ------------------------------------------------------------
 --  1. Parsing repetitions
@@ -19,10 +21,10 @@ fmap :: (a -> b) -> [a] -> [b]
 (String -> Maybe (a, String)) -> (String -> Maybe ([a], String))
 [a] ++ zeroOrMore p | pure []
 
-runParser (zeroOrMore (satify isUpper)) "ABCdEfgH"
-runParser (oneOrMore  (satify isUpper)) "ABCdEfgH"
-runParser (zeroOrMore (satify isUpper)) "abcdEfgH"
-runParser (oneOrMore  (satify isUpper)) "abcdEfgH"
+runParser (zeroOrMore (satisfy isUpper)) "ABCdEfgH"
+runParser (oneOrMore  (satisfy isUpper)) "ABCdEfgH"
+runParser (zeroOrMore (satisfy isUpper)) "abcdEfgH"
+runParser (oneOrMore  (satisfy isUpper)) "abcdEfgH"
  -}
 
 -- actually zeroOrMore can use oneOrMore to impl;
@@ -36,12 +38,18 @@ oneOrMore p  =  liftA (:) p <*> zeroOrMore p
 ------------------------------------------------------------
 --  2. Utilities
 ------------------------------------------------------------
+{-
+runParser ident "foobar baz"
+runParser ident "foo33fA"
+runParser ident "abad" -- Nothing
+runParser ident ""
+-}
 
 spaces :: Parser String
-spaces = undefined
+spaces = zeroOrMore (satisfy isSpace)
 
 ident :: Parser String
-ident = undefined
+ident = liftA (:) (satisfy isAlpha) <*> (zeroOrMore (satisfy isAlphaNum))
 
 ------------------------------------------------------------
 --  3. Parsing S-expressions
