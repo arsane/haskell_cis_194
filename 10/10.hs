@@ -9,11 +9,17 @@ import Control.Applicative
 first :: (a -> b) -> (a, c) -> (b, c)
 first f (x, y) = (f x, y)
 
+{-
+fmap :: (a -> b) -> Parser a -> Parser b
+g :: String -> Maybe (a, String)
+h :: String -> Maybe (b, String)
+
+first:: (a -> b ) -> (a, String) -> (b, String)
+-}
 instance Functor Parser where
+	-- use Maybe Functor
 	fmap f (Parser g) = Parser h
-		where h xs = case g xs of
-			Nothing 		-> Nothing
-			Just (y, str) 	-> Just (f y, str)
+		where h xs = fmap (first f) (g xs)
 
 -- exercise 2
 -- to be improved
