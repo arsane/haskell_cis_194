@@ -3,6 +3,7 @@
 import AParser
 
 import Control.Applicative
+import Data.Char
 
 -- exercise 1
 
@@ -44,7 +45,6 @@ Emp <$> parseName <*> parsePhone :: Parser Employee
 	     (String -> Maybe (a, String))    ->
 	     (String -> Maybe (b, String))
 
-Maybe (a->b) -> Maybe a -> Maybe b
 --
 -- Monad
 Maybe String -> (String -> Maybe (a, String)) -> Maybe (a, String) -- >>=
@@ -68,6 +68,46 @@ instance Applicative Parser where
 				u = (snd <$> t)	>>= g
 
 -- exercise 3
+-- Applicative inerface only to define new Parser
+{-
+(a -> b -> (a, b)) <$> Parser a :: Parser (b -> (a, b))
 
--- abParser :: Parser (Char, Char)
--- abParser = char 'a' <*> char 'b'
+runParser abParser  "abcdef"
+runParser abParser  "aecdef"
+runParser abParser_ "abcdef"
+runParser abParser_ "aecdef"
+runParser intPair "12 34"
+
+-}
+abParser :: Parser (Char, Char)
+abParser = (\a b -> (a, b))  <$> char 'a' <*> char 'b'
+
+abParser_ :: Parser ()
+abParser_ = (\_ _ -> ())     <$> char 'a' <*> char 'b'
+
+intPair :: Parser [Integer]
+intPair = (\a _ b -> [a, b]) <$> posInt <*> char ' ' <*> posInt
+
+-- exercise 4
+{-
+(<|>) is intended to represent choice.
+ -}
+--class Applicative f => Alternative f where
+--	empty :: f a
+--	(<|>) :: fa -> f a -> f a
+
+instance Alternative Parser where
+	empty = Parser (\_ -> Nothing)
+	-- use Maybe's Alternative instance
+	Parser f <|> Parser g = Parser h
+		where h xs = f xs <|> g xs
+
+-- exercise 5
+{-
+	runParser intOrUppercase "342abcd"
+	runParser intOrUppercase "XYZ"
+	runParser "foo"
+ -}
+intOrUppercase :: Parser ()
+intOrUppercase = (g <$> posInt) <|> (g <$> (satisfy isUpper))
+	where g _ = ()
