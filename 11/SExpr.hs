@@ -10,12 +10,28 @@ import Control.Applicative
 ------------------------------------------------------------
 --  1. Parsing repetitions
 ------------------------------------------------------------
+{-
+String -> Maybe ([a], String)
 
+fmap :: (a -> b) -> [a] -> [b]
+<*>  ::  [a->b]  -> [a] -> [b]
+
+(String -> Maybe (a, String)) -> (String -> Maybe ([a], String))
+[a] ++ zeroOrMore p | pure []
+
+runParser (zeroOrMore (satify isUpper)) "ABCdEfgH"
+runParser (oneOrMore  (satify isUpper)) "ABCdEfgH"
+runParser (zeroOrMore (satify isUpper)) "abcdEfgH"
+runParser (oneOrMore  (satify isUpper)) "abcdEfgH"
+ -}
+
+-- actually zeroOrMore can use oneOrMore to impl;
+-- as for cross reference.
 zeroOrMore :: Parser a -> Parser [a]
-zeroOrMore p = undefined
+zeroOrMore p = (liftA (:) p <*> zeroOrMore p) <|> pure []
 
 oneOrMore :: Parser a -> Parser [a]
-oneOrMore p = undefined
+oneOrMore p  =  liftA (:) p <*> zeroOrMore p
 
 ------------------------------------------------------------
 --  2. Utilities
