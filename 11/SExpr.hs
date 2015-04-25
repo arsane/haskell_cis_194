@@ -68,3 +68,15 @@ data Atom = N Integer | I Ident
 data SExpr = A Atom
            | Comb [SExpr]
   deriving Show
+
+{-
+(*>) :: Applicative f => f a -> f b -> f b
+(<*) :: Applicative f => f a -> f b -> f a
+-}
+
+parseAtom :: Parser Atom 
+parseAtom = (liftA N posInt) <|> (liftA I ident)
+
+-- parseSExpr :: Parser SExpr
+-- parseSExpr = (liftA A parseAtom) <|> (liftA Comb ( char '(' (*>) spaces (*>) parseSExpr (<*) spaces (<*) char ')'))
+
