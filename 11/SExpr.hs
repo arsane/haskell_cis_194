@@ -76,8 +76,8 @@ data SExpr = A Atom
 -- fixme: make space is mandatory between atoms; optional between '(' | ')' and atom.
 -}
 
-parseAtom :: Parser Atom 
-parseAtom = ((liftA N posInt) <|> (liftA I ident)) <* spaces
-
 parseSExpr :: Parser SExpr
-parseSExpr = (liftA A parseAtom) <|> (liftA Comb (spaces *> char '(' *> spaces *> oneOrMore parseSExpr <* spaces <* char ')' <* spaces))
+parseSExpr = (liftA A parseAtom) <|> (liftA Comb parseComb) where
+			parseAtom   =  spaceWrap ((liftA N posInt) <|> (liftA I ident))
+			parseComb   = (spaceWrap $ char '(') *> oneOrMore parseSExpr <* (spaceWrap $ char ')') where
+			spaceWrap p =  spaces *> p <* spaces
