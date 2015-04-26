@@ -72,11 +72,12 @@ data SExpr = A Atom
 {-
 (*>) :: Applicative f => f a -> f b -> f b
 (<*) :: Applicative f => f a -> f b -> f a
+
+-- fixme: make space is mandatory between atoms; optional between '(' | ')' and atom.
 -}
 
 parseAtom :: Parser Atom 
-parseAtom = (liftA N posInt) <|> (liftA I ident)
+parseAtom = ((liftA N posInt) <|> (liftA I ident)) <* spaces
 
--- parseSExpr :: Parser SExpr
--- parseSExpr = (liftA A parseAtom) <|> (liftA Comb ( char '(' (*>) spaces (*>) parseSExpr (<*) spaces (<*) char ')'))
-
+parseSExpr :: Parser SExpr
+parseSExpr = (liftA A parseAtom) <|> (liftA Comb (spaces *> char '(' *> spaces *> oneOrMore parseSExpr <* spaces <* char ')' <* spaces))
